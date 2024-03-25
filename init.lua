@@ -66,6 +66,13 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
+  'tpope/vim-unimpaired',
+  'inkarkat/vim-ingo-library',
+  {'inkarkat/vim-mark',
+    lazy = false,
+  },
+
+
   -- Git related plugins
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
@@ -88,6 +95,8 @@ require('lazy').setup({
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
+      -- hooks for formatting
+      'jose-elias-alvarez/null-ls.nvim',
     },
   },
 
@@ -112,34 +121,40 @@ require('lazy').setup({
     },
   },
 
-  { -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
-  },
+-- [tenerex] I moved this into the plugin folder. It should not be maybe. :)
+--  { -- Theme inspired by Solarized
+--    'svrana/neosolarized.nvim',
+--    priority = 1000,
+--    config = function()
+--      vim.cmd.colorscheme 'neosolarized'
+--    end,
+--  },
 
   { -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
     -- See `:help lualine.txt`
     opts = {
       options = {
-        icons_enabled = false,
-        theme = 'onedark',
+        icons_enabled = true,
+        theme = 'solarized_light',
         component_separators = '|',
         section_separators = '',
       },
     },
+    dependencies = {
+      'kyazdani42/nvim-web-devicons',
+    }
   },
 
   { -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
+    main = "ibl",
     -- Enable `lukas-reineke/indent-blankline.nvim`
     -- See `:help indent_blankline.txt`
     opts = {
-      char = '┊',
-      show_trailing_blankline_indent = false,
+      indent = {
+        char = '┊',
+      }
     },
   },
 
@@ -172,6 +187,13 @@ require('lazy').setup({
     end,
   },
 
+  {
+    'nvim-tree/nvim-tree.lua',
+    dependencies = {
+      'nvim-web-devicons'
+    },
+  },
+
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -194,6 +216,25 @@ require('lazy').setup({
 
 -- Set highlight on search
 vim.o.hlsearch = false
+
+-- Set relative numbers
+vim .o.relativenumber = true
+
+-- Open split vertical below the current One
+vim.o.splitbelow = true
+
+-- Open split vertical below the current One
+vim.o.splitbelow = true
+
+-- Set tabstop and shiftwith
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+
+-- Set autoindet
+vim.o.autoindent = true
+
+-- Set cursor to always have at least 8 lines around
+vim.opt.scrolloff = 8
 
 -- Make line numbers default
 vim.wo.number = true
@@ -231,6 +272,12 @@ vim.o.completeopt = 'menuone,noselect'
 vim.o.termguicolors = true
 
 -- [[ Basic Keymaps ]]
+--
+vim.keymap.set("n", "J", "mzJ`z")
+vim.keymap.set("n", "<C-d>", "<C-d>zz")
+vim.keymap.set("n", "<C-u>", "<C-u>zz")
+vim.keymap.set("n", "n", "nzzzv")
+vim.keymap.set("n", "N", "Nzzzv")
 
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
@@ -385,7 +432,8 @@ local on_attach = function(_, bufnr)
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  -- removing the below since I use <C-k> for switching to tmux
+  --  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -492,6 +540,10 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
+
+require("nvim-tree").setup()
+vim.keymap.set('n', "<C-n>", require("nvim-tree.api").tree.toggle)
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
